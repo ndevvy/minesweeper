@@ -1,5 +1,5 @@
 require_relative 'tile.rb'
-
+require_relative 'explorer.rb'
 
 class Board
   SIZE = 9
