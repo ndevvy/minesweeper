@@ -1,12 +1,13 @@
 class Tile
 
-  attr_accessor :state, :flag, :hidden, :number
+  attr_accessor :state, :flag, :hidden, :number, :adj_bombs
   attr_reader :pos, :bomb
 
   def initialize(pos, bomb=false)
     @pos, @state, @bomb = pos, state, bomb
     @hidden = true
     @flag = false
+    @adj_bombs = 0
   end
 
   def get_number
@@ -30,15 +31,16 @@ class Tile
   end
 
   def to_s_master
-    if bomb
-      return 'b'
-    else
-      return '_'
-    end
+    return adj_bombs.to_s
+    # if bomb
+    #   return 'b'
+    # else
+    #   return '_'
+    # end
   end
 
   def to_s
-    
+
   end
 
 end
