@@ -1,15 +1,20 @@
 class Tile
 
-  attr_accessor :state, :flag
-  attr_reader :pos, :val
+  attr_accessor :state, :flag, :hidden, :number
+  attr_reader :pos, :bomb
 
-  def initialize(pos, state=:hidden, val)
-    @pos, @state, @val = pos, state, val
+  def initialize(pos, bomb=false)
+    @pos, @state, @bomb = pos, state, bomb
+    @hidden = true
     @flag = false
   end
 
+  def get_number
+    # board needs to give number info to tiles
+  end
+
   def reveal
-    state = :reveal
+    hidden = false
   end
 
   def flagged?
@@ -22,6 +27,18 @@ class Tile
 
   def unflag
     flag = false
+  end
+
+  def to_s_master
+    if bomb
+      return 'b'
+    else
+      return '_'
+    end
+  end
+
+  def to_s
+    
   end
 
 end
