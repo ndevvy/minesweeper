@@ -4,7 +4,7 @@ class Tile
   attr_reader :pos, :bomb
 
   def initialize(pos, bomb=false)
-    @pos, @state, @bomb = pos, state, bomb
+    @pos, @bomb = pos, bomb
     @hidden = true
     @flag = false
     @adj_bombs = 0
@@ -30,8 +30,12 @@ class Tile
     flag = false
   end
 
-  def to_s_master
-    return adj_bombs.to_s
+  def to_s_god
+    if bomb
+      "B"
+    else
+      adj_bombs.to_s
+    end
     # if bomb
     #   return 'b'
     # else
@@ -40,7 +44,14 @@ class Tile
   end
 
   def to_s
-
+    # if flag == true
+    #   "F"
+    # els
+    if hidden
+      "-"
+    else
+      adj_bombs.to_s
+    end
   end
 
 end

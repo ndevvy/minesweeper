@@ -1,4 +1,6 @@
 require_relative 'tile.rb'
+require 'byebug'
+require 'yaml'
 
 class Board
   SIZE = 9
@@ -9,16 +11,94 @@ class Board
 
   def initialize(grid=Array.new(SIZE) {Array.new(SIZE)})
     @grid = grid
+    @lost = false
+    @won = false
+  end
+
+  def parse_input(input)
+    if input[0].downcase == "f"
+      toggle_flag_pos
+    else
+      row, col = [input[0].to_i,input[-1].to_i]
+      eval_move([row,col])
+    end
+  end
+
+  def get_flag_pos
+    while true
+      puts "Enter position to toggle flag: "
+      pos = gets.chomp
+      row, col = [input[0],input[-1]]
+      tile = grid[row][col]
+      if tile.hidden == false
+        puts "No flagging shown tiles, please try again."
+      elsif tile.flag
+         tile.flag = false
+         return
+      elsif
+          tile.flag = true
+          return
+      end
+   end
   end
 
   def prepare_board
     populate_mines
-    compute_neighbors
+    assign_bomb_counts
+  end
+
+  def lost?
+    @lost
+  end
+
+  def won?
+    @won
   end
 
   def out_of_bounds?(pos)
     drow, dcol = pos
     [drow, dcol].any? { |el| el < 0  || (el > SIZE - 1)}
+  end
+
+
+  def eval_move(pos)
+    x, y = pos
+    if grid[x][y].bomb
+      @lost = true
+    else
+      self.reveal_tiles(pos)
+    end
+  end
+
+  def reveal_tiles(pos)
+    x, y = pos
+    # debugger
+    grid[x][y].hidden = false
+    return if grid[x][y].adj_bombs > 0
+    neighbors = grab_neighbors([x,y])
+    neighbors.each do |neighbor|
+      x, y = neighbor
+      reveal_tiles(neighbor) unless grid[x][y].hidden == false || grid[x][y].bomb
+    end
+  end
+
+
+  # def take_move(pos)
+  #   show tile
+  #   queue = [bomb free nighbors]
+  #   until queue is empty:
+  #     shift from queue
+  #     call take_move on front of queue
+  # end
+
+
+  def grab_hidden_tiles(positions)
+    hidden_neighbors = []
+    positions.each do |pos|
+      row, col = pos
+      hidden_neighbors << grid[row][col] if grid[row][col].hidden
+    end
+    hidden_neighbors
   end
 
   def assign_bomb_counts
@@ -88,7 +168,18 @@ class Board
     grid.each do |row|
     row_string = ""
       row.each do |tile|
-        row_string += tile.to_s_master + " "
+        row_string += tile.to_s + " "
+      end
+      puts row_string
+    end
+    return true
+  end
+
+  def render_god
+    grid.each do |row|
+    row_string = ""
+      row.each do |tile|
+        row_string += tile.to_s_god + " "
       end
       puts row_string
     end
