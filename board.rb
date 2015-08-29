@@ -3,8 +3,8 @@ require 'byebug'
 require 'yaml'
 
 class Board
-  SIZE = 10
-  MINE_PERCENTAGE = 20
+  SIZE = 20
+  MINE_PERCENTAGE = 10
   OFFSETS = [[-1,-1], [-1,0], [-1,1], [0,1], [1,1], [1,0], [1,-1], [0,-1]]
 
   attr_accessor :grid
@@ -17,7 +17,7 @@ class Board
 
   def parse_input(input)
     if input[0].downcase == "f"
-      toggle_flag_pos
+      get_flag_pos
     else
       row, col = [input[0].to_i,input[-1].to_i]
       eval_move([row,col])
@@ -26,16 +26,16 @@ class Board
 
   def get_flag_pos
     while true
-      puts "Enter position to toggle flag: "
-      pos = gets.chomp
-      row, col = [input[0],input[-1]]
+      puts "Enter position to toggle FLAG: "
+      input = gets.chomp
+      row, col = [input[0].to_i,input[-1].to_i]
       tile = grid[row][col]
       if tile.hidden == false
         puts "No flagging shown tiles, please try again."
-      elsif tile.flag
+      elsif tile.flagged?
          tile.flag = false
          return
-      elsif
+      else
           tile.flag = true
           return
       end
@@ -73,12 +73,17 @@ class Board
   def reveal_tiles(pos)
     x, y = pos
     # debugger
+    if grid[x][y].flagged?
+      return
+    end
     grid[x][y].hidden = false
     return if grid[x][y].adj_bombs > 0
     neighbors = grab_neighbors([x,y])
     neighbors.each do |neighbor|
       x, y = neighbor
-      reveal_tiles(neighbor) unless grid[x][y].hidden == false || grid[x][y].bomb
+      unless grid[x][y].hidden == false || grid[x][y].bomb
+        reveal_tiles(neighbor)
+      end
     end
   end
 
@@ -154,14 +159,14 @@ class Board
     return true
   end
 
-  def tile_roll
-    roll = rand(100)
-    roll <= MINE_PERCENTAGE
-  end
-
   def make_random_tile(pos)
     bomb_status = tile_roll
     Tile.new(pos, bomb_status)
+  end
+
+  def tile_roll
+    roll = rand(100)
+    roll <= MINE_PERCENTAGE
   end
 
   def render

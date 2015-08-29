@@ -18,8 +18,12 @@ class Tile
     hidden = false
   end
 
+  def bomb?
+    bomb == true
+  end
+
   def flagged?
-    flag == true
+    @flag == true
   end
 
   def flag
@@ -44,10 +48,9 @@ class Tile
   end
 
   def to_s
-    # if flag == true
-    #   "F"
-    # els
-    if hidden
+    if flagged?
+      "F"
+    elsif hidden
       "-"
     else
       adj_bombs.to_s

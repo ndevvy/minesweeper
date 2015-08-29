@@ -13,14 +13,15 @@ class Game
     until game_over?
       play_turn
     end
-    puts "You lose! Sorry I'm not sorry." if board.lost
+    puts "You lose! Sorry I'm not sorry." if board.lost?
+    puts "You win!"
   end
 
   def play_turn
     board.render
     puts "#{name}, please make a move"
     puts "Enter 'flag' if you would like to flag a position"
-  
+
     input = gets.chomp
     board.parse_input(input)
   end
@@ -28,4 +29,11 @@ class Game
   def game_over?
     board.won? || board.lost?
   end
+end
+
+if __FILE__ == $PROGRAM_NAME
+  puts "Enter your name: "
+  name = gets.chomp
+  game = Game.new(name)
+  game.play
 end
