@@ -4,7 +4,7 @@ require 'yaml'
 
 class Board
   SIZE = 10
-  MINE_PERCENTAGE = 1
+  MINE_PERCENTAGE = 9
   OFFSETS = [[-1,-1], [-1,0], [-1,1], [0,1], [1,1], [1,0], [1,-1], [0,-1]]
 
   attr_accessor :grid

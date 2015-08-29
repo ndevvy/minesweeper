@@ -21,9 +21,16 @@ class Game
     board.render
     puts "#{name}, please make a move"
     puts "Enter 'flag' if you would like to flag a position"
-
+    puts "Enter 'save' to save"
     input = gets.chomp
-    board.parse_input(input)
+    if input.downcase == "save"
+      puts "Name your saved game:"
+      filename = gets.chomp + ".yml"
+      File.write(filename, YAML.dump(self))
+      puts "Game saved to #{filename}"
+    else
+      board.parse_input(input)
+    end
   end
 
   def game_over?
@@ -32,8 +39,15 @@ class Game
 end
 
 if __FILE__ == $PROGRAM_NAME
-  puts "Enter your name: "
-  name = gets.chomp
-  game = Game.new(name)
-  game.play
+  puts 'Enter your name, or enter "L" to load: '
+  input = gets.chomp
+  if input.downcase == "l"
+    puts "Enter the name of your saved game: "
+    input = gets.chomp + ".yml"
+    YAML.load_file(input).play
+  else
+    game = Game.new(input)
+    puts "Loading saved game: #{input}"
+    game.play
+  end
 end
