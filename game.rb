@@ -283,10 +283,10 @@ class Game
   def initialize(name="Player1")
     @name = name
     @board = Board.new
+    board.prepare_board
   end
 
   def play
-    board.prepare_board
     until game_over?
       play_turn
     end
@@ -297,6 +297,7 @@ class Game
     end
   end
 
+private
   def play_turn
     system("clear")
     board.render
@@ -308,7 +309,6 @@ class Game
       puts "Name your saved game:"
       filename = gets.chomp
       File.write(filename, YAML.dump(self))
-      puts "Game saved to #{filename}"
     else
       board.parse_input(input)
     end
@@ -320,15 +320,12 @@ class Game
 end
 
 if __FILE__ == $PROGRAM_NAME
-  puts 'Enter your name, or enter "L" to load: '
-  input = gets.chomp
-  if input.downcase == "l"
-    puts "Enter the name of your saved game: "
+  case ARGV.count
+  when 0
+    puts 'Enter your name'
     input = gets.chomp
-    puts "Loading saved game: #{input}"
-    YAML.load_file(input).play
-  else
-    game = Game.new(input)
-    game.play
+    Game.new(input).play
+  when 1
+    YAML.load_file(ARGV.shift).play
   end
 end
