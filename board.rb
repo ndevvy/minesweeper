@@ -3,7 +3,7 @@ require 'byebug'
 require 'yaml'
 
 class Board
-  SIZE = 9
+  SIZE = 10
   MINE_PERCENTAGE = 20
   OFFSETS = [[-1,-1], [-1,0], [-1,1], [0,1], [1,1], [1,0], [1,-1], [0,-1]]
 
