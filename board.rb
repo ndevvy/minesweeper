@@ -3,11 +3,12 @@ require 'byebug'
 require 'yaml'
 
 class Board
-  SIZE = 20
-  MINE_PERCENTAGE = 10
+  SIZE = 10
+  MINE_PERCENTAGE = 1
   OFFSETS = [[-1,-1], [-1,0], [-1,1], [0,1], [1,1], [1,0], [1,-1], [0,-1]]
 
   attr_accessor :grid
+  attr_reader :all_indices
 
   def initialize(grid=Array.new(SIZE) {Array.new(SIZE)})
     @grid = grid
@@ -45,6 +46,7 @@ class Board
   def prepare_board
     populate_mines
     assign_bomb_counts
+    get_indices
   end
 
   def lost?
@@ -52,7 +54,13 @@ class Board
   end
 
   def won?
-    @won
+    all_indices.each do |tile|
+      x, y = tile
+      if grid[x][y].hidden == true && grid[x][y].bomb == false
+        return false
+      end
+    end
+    return true
   end
 
   def out_of_bounds?(pos)
@@ -87,16 +95,6 @@ class Board
     end
   end
 
-
-  # def take_move(pos)
-  #   show tile
-  #   queue = [bomb free nighbors]
-  #   until queue is empty:
-  #     shift from queue
-  #     call take_move on front of queue
-  # end
-
-
   def grab_hidden_tiles(positions)
     hidden_neighbors = []
     positions.each do |pos|
@@ -116,6 +114,7 @@ class Board
     return true
   end
 
+
   def compute_count(pos)
     row, col = pos
     neighbors = grab_neighbors(pos)
@@ -128,13 +127,13 @@ class Board
   end
 
   def get_indices
-    all_indices = []
+    @all_indices = []
     (0...SIZE).each do |row|
       (0...SIZE).each do |col|
         all_indices << [row,col]
       end
      end
-   all_indices
+   @all_indices
   end
 
   def grab_neighbors(pos)
