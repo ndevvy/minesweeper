@@ -12,6 +12,7 @@ module Cursorable
     "a" => :down,
     "s" => :up,
     "d" => :right,
+    "1" => :one,
     "\t" => :tab,
     "\r" => :return,
     "\n" => :newline,
@@ -48,6 +49,8 @@ module Cursorable
       nil
     when :f
       [:flag, @cursor_pos]
+    when :one
+      [:savegame]
     else
       puts key
     end

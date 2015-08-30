@@ -16,6 +16,7 @@ class Display
   }
 
   GLOBAL_BACKGROUND = :grey
+
   include Cursorable
 
   attr_accessor :board
@@ -39,7 +40,7 @@ class Display
 
 
   def colors_for(i, j)
-    
+
     if [i, j] == @cursor_pos
       bg = :light_red
     else
@@ -52,7 +53,7 @@ class Display
           color = :light_red
         end
     elsif @board.grid[i][j].flagged?
-      color = :red
+      color = :light_red
     else
       color = :light_white
     end
@@ -62,7 +63,7 @@ class Display
   def render(last=false)
     system("clear")
     if last == false
-      puts "Arrow keys or WASD to move. F to flag a tile. Space or enter to reveal."
+      puts "Arrow keys or WASD to move. F to flag a tile. Space or enter to reveal. 1 to save game."
     end
     build_grid
   end

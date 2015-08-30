@@ -62,7 +62,7 @@ class Board
   MINE_PERCENTAGE = 10
   OFFSETS = [[-1,-1], [-1,0], [-1,1], [0,1], [1,1], [1,0], [1,-1], [0,-1]]
 
-  attr_accessor :grid
+  attr_accessor :grid, :savegame
   attr_reader :all_indices
 
   def initialize(grid=Array.new(SIZE) {Array.new(SIZE)})
@@ -79,6 +79,8 @@ class Board
 
     if input.include?(:flag)
       flag_pos(input[1])
+    elsif input.include?(:savegame)
+      @savegame = true
     else
       eval_move(input)
     end
@@ -247,8 +249,18 @@ class Game
 
   def play
 
-    until game_over?
+    until game_over? || board.savegame == true
+      move = player.move
       board.parse_input(player.move)
+    end
+
+
+    if board.savegame == true
+      puts "Name your saved game:"
+      filename = gets.chomp
+      File.write(filename, YAML.dump(self))
+      board.savegame = false
+      play
     end
 
     if board.lost?
@@ -262,21 +274,6 @@ class Game
       puts "You win!"
     end
 
-  end
-
-
-  def play_turn
-    puts "#{name}, please make a move"
-    puts "Enter 'flag' if you would like to flag a position"
-    puts "Enter 'save' to save"
-    input = gets.chomp
-    if input.downcase == "save"
-      puts "Name your saved game:"
-      filename = gets.chomp
-      File.write(filename, YAML.dump(self))
-    else
-      board.parse_input(input)
-    end
   end
 
   def game_over?
