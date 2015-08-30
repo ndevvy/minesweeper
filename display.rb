@@ -6,7 +6,7 @@ class Display
   COLORS = {
     0 => :white,
     1 => :light_green,
-    2 => :green,
+    2 => :light_cyan,
     3 => :light_blue,
     4 => :blue,
     5 => :light_magenta,
@@ -47,7 +47,7 @@ class Display
       bg = GLOBAL_BACKGROUND
     end
 
-    if (@board.grid[i][j].hidden == false) #&& (@board.grid[i][j].flag == false)
+    if (@board.grid[i][j].hidden == false) 
         color = COLORS[@board.grid[i][j].adj_bombs]
         if @board.grid[i][j].bomb == true
           color = :light_red

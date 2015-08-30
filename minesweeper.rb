@@ -2,6 +2,8 @@ require 'colorize'
 require 'yaml'
 require_relative 'player'
 
+# todo: add setup phase, high scores, timer
+
 class Tile
 
   attr_accessor :state, :flag, :hidden, :number, :adj_bombs
@@ -58,7 +60,7 @@ end
 
 class Board
 
-  SIZE = 10
+  SIZE = 24
   MINE_PERCENTAGE = 10
   OFFSETS = [[-1,-1], [-1,0], [-1,1], [0,1], [1,1], [1,0], [1,-1], [0,-1]]
 
@@ -250,16 +252,14 @@ class Game
   def play
 
     until game_over? || board.savegame == true
-      move = player.move
       board.parse_input(player.move)
     end
 
-
     if board.savegame == true
+      board.savegame = false
       puts "Name your saved game:"
       filename = gets.chomp
       File.write(filename, YAML.dump(self))
-      board.savegame = false
       play
     end
 
