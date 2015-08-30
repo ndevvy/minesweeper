@@ -1,23 +1,8 @@
 require 'colorize'
 require 'yaml'
+require_relative 'player'
 
 class Tile
-
-  COLORS = {
-    0 => :white,
-    1 => :light_green,
-    2 => :green,
-    3 => :light_blue,
-    4 => :blue,
-    5 => :light_magenta,
-    6 => :magenta,
-    7 => :light_red,
-    8 => :red
-  }
-
-  UNICODE = {
-    :flag => "\u2691"
-  }
 
   attr_accessor :state, :flag, :hidden, :number, :adj_bombs
   attr_reader :pos, :bomb
@@ -29,16 +14,12 @@ class Tile
     @adj_bombs = 0
   end
 
-  def get_number
-    # board needs to give number info to tiles
-  end
-
   def reveal
     hidden = false
   end
 
   def bomb?
-    bomb == true
+    @bomb == true
   end
 
   def flagged?
@@ -59,20 +40,17 @@ class Tile
     else
       adj_bombs.to_s
     end
-    # if bomb
-    #   return 'b'
-    # else
-    #   return '_'
-    # end
   end
 
-  def to_s
+  def tilerender
     if flagged?
-      "\u2691".encode('utf-8').colorize(:red)
+      return "\u2691".encode('utf-8')
     elsif hidden
-      "-"
+      return "\u25A0".encode('utf-8')
+    elsif bomb? == true
+      return "\u2688".encode('utf-8')
     else
-      adj_bombs.to_s.colorize(COLORS[adj_bombs])
+      return self.adj_bombs.to_s
     end
   end
 
@@ -81,7 +59,7 @@ end
 class Board
 
   SIZE = 10
-  MINE_PERCENTAGE = 9
+  MINE_PERCENTAGE = 10
   OFFSETS = [[-1,-1], [-1,0], [-1,1], [0,1], [1,1], [1,0], [1,-1], [0,-1]]
 
   attr_accessor :grid
@@ -94,31 +72,36 @@ class Board
   end
 
   def parse_input(input)
-    if input[0].downcase == "f"
-      get_flag_pos
+
+    if input == nil
+      return
+    end
+
+    if input.include?(:flag)
+      flag_pos(input[1])
     else
-      row, col = [input[0].to_i,input[-1].to_i]
-      eval_move([row,col])
+      eval_move(input)
+    end
+
+  end
+
+   def flag_pos(pos)
+     x, y = pos
+     tile = grid[x][y]
+
+     if tile.hidden == false
+       return
+     end
+
+     if tile.flagged?
+       tile.flag = false
+       return
+     else
+      tile.flag = true
+      return
     end
   end
 
-  def get_flag_pos
-    while true
-      puts "Enter position to toggle FLAG: "
-      input = gets.chomp
-      row, col = [input[0].to_i,input[-1].to_i]
-      tile = grid[row][col]
-      if tile.hidden == false
-        puts "No flagging shown tiles, please try again."
-      elsif tile.flagged?
-         tile.flag = false
-         return
-      else
-          tile.flag = true
-          return
-      end
-   end
-  end
 
   def prepare_board
     populate_mines
@@ -245,62 +228,44 @@ class Board
     roll <= MINE_PERCENTAGE
   end
 
-  def render
-    numbers = (0..SIZE-1).to_a
-    header = "  "
-    numbers.each do |num|
-      header << num.to_s + " "
-    end
-    puts header
-    grid.each_with_index do |row, index|
-    row_string = "#{index} "
-      row.each do |tile|
-        row_string += tile.to_s + " "
-      end
-      puts row_string
-    end
-    return true
-  end
-
-  def render_god
-
-    grid.each do |row|
-    row_string = ""
-      row.each do |tile|
-        row_string += tile.to_s_god + " "
-      end
-      puts row_string
-    end
-    return true
+  def in_bounds?(pos)
+    pos.all? { |x| x.between?(0, SIZE-1) }
   end
 
 end
 
 class Game
 
-  attr_accessor :board, :name
+  attr_accessor :board, :name, :player
 
   def initialize(name="Player1")
     @name = name
     @board = Board.new
-    board.prepare_board
+    @board.prepare_board
+    @player = Player.new(@board)
   end
 
   def play
+
     until game_over?
-      play_turn
+      board.parse_input(player.move)
     end
+
     if board.lost?
-      puts "BOOM. You lose!"
+      board.all_indices.each do |idx|
+        x, y = idx
+        board.grid[x][y].hidden = false
+      end
+        @player.display.render(true)
+        puts "BOOM. You lose!"
     else
       puts "You win!"
     end
+
   end
 
-private
+
   def play_turn
-    system("clear")
-    board.render
     puts "#{name}, please make a move"
     puts "Enter 'flag' if you would like to flag a position"
     puts "Enter 'save' to save"
@@ -317,6 +282,7 @@ private
   def game_over?
     board.won? || board.lost?
   end
+
 end
 
 if __FILE__ == $PROGRAM_NAME
