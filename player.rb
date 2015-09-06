@@ -3,7 +3,7 @@ require_relative "display"
 class Player
 
   attr_reader :display
-  
+
   def initialize(board)
     @display = Display.new(board)
   end
@@ -16,4 +16,5 @@ class Player
     end
     result
   end
+  
 end

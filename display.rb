@@ -4,18 +4,18 @@ require_relative 'minesweeper.rb'
 
 class Display
   COLORS = {
-    0 => :white,
-    1 => :light_green,
-    2 => :light_cyan,
+    0 => :light_black,
+    1 => :green,
+    2 => :cyan,
     3 => :light_blue,
     4 => :blue,
     5 => :light_magenta,
     6 => :magenta,
-    7 => :light_red,
-    8 => :red
+    7 => :light_black,
+    8 => :black
   }
 
-  GLOBAL_BACKGROUND = :grey
+  GLOBAL_BACKGROUND = :light_white
 
   include Cursorable
 
@@ -47,7 +47,7 @@ class Display
       bg = GLOBAL_BACKGROUND
     end
 
-    if (@board.grid[i][j].hidden == false) 
+    if (@board.grid[i][j].hidden == false)
         color = COLORS[@board.grid[i][j].adj_bombs]
         if @board.grid[i][j].bomb == true
           color = :light_red
@@ -55,7 +55,7 @@ class Display
     elsif @board.grid[i][j].flagged?
       color = :light_red
     else
-      color = :light_white
+      color = :white
     end
     { background: bg, color: color }
   end
@@ -63,7 +63,7 @@ class Display
   def render(last=false)
     system("clear")
     if last == false
-      puts "Arrow keys or WASD to move. F to flag a tile. Space or enter to reveal. 1 to save game."
+      puts "keys or wasd to move cursor - spacebar to reveal\n  f to flag - 1 to save game"
     end
     build_grid
   end
