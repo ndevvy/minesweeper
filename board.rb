@@ -74,17 +74,13 @@ class Board
 
   def reveal_tiles(pos)
     x, y = pos
-    if grid[x][y].flagged?
-      return
-    end
+    return if grid[x][y].flagged?
     grid[x][y].hidden = false
     return if grid[x][y].adj_bombs > 0
-    neighbors = grab_neighbors([x,y])
-    neighbors.each do |neighbor|
-      x, y = neighbor
-      unless grid[x][y].hidden == false || grid[x][y].bomb
-        reveal_tiles(neighbor)
-      end
+    neighbors = find_neighbors([x,y])
+    neighbors.each do |neighbor_pos|
+      x, y = neighbor_pos
+      reveal_tiles(neighbor_pos) unless grid[x][y].hidden == false || grid[x][y].bomb
     end
   end
 
@@ -101,15 +97,15 @@ class Board
     all_indices = get_indices
 
     all_indices.each do |pos|
-      compute_count(pos)
+      count_adjacent_bombs(pos)
     end
 
     return true
   end
 
-  def compute_count(pos)
+  def count_adjacent_bombs(pos)
     row, col = pos
-    neighbors = grab_neighbors(pos)
+    neighbors = find_neighbors(pos)
     neighbors.each do |neighbor|
       row2, col2 = neighbor
       if grid[row2][col2].bomb
@@ -128,7 +124,7 @@ class Board
    @all_indices
   end
 
-  def grab_neighbors(pos)
+  def find_neighbors(pos)
     row, col = pos
     neighbors = []
     OFFSETS.each do |pos|
