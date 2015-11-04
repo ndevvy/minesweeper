@@ -1,3 +1,4 @@
+![Minesweeper](minesweep.png)
 # Ruby Minesweeper
 Command-line Minesweeper with cursor input, [colorized](https://github.com/fazibear/colorize) Unicode display, and the ability to save and load games.
 
